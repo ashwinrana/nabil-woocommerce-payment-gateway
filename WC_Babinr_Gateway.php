@@ -109,8 +109,8 @@ class WC_Babinr_Gateway extends WC_Payment_Gateway {
 		die();
 	}
 
-	add_action( "template_redirect", "response_handler" );
-	add_action( 'woocommerce_api_{webhook name}', array( $this, 'webhook' ) );
+	// add_action( "template_redirect", "response_handler" );
+	add_action( 'woocommerce_api_wc_babinr_gateway', array( $this, 'response_handler' ) );
 
 	function send_request_to_bank( $order = null ) {
 		if(!is_null($order)) {
