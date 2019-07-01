@@ -4,7 +4,8 @@
  * @version 0.0.1
  */
 
-class WC_Babinr_Gateway extends WC_Payment_Gateway {
+class WC_Babinr_Gateway extends WC_Payment_Gateway 
+{
 
 	public function __construct() {
 		$this->id = "babinr_gateway";
@@ -12,15 +13,20 @@ class WC_Babinr_Gateway extends WC_Payment_Gateway {
 		$this->has_fields = false;
 		$this->method_title = "Babinr Payment Gateway";
 		$this->method_description = "Create Your Own WoCommerce Payment Gateway Plugin";
+		$this->description = "Pay Using your Credit Card Online.";
 		$this->init_form_fields();
 		$this->init_settings();
 		$this->title = $this->get_option( 'title' );
 
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
+		// add_action( 'woocommerce_api_wc_babinr_gateway', array( $this, 'response_handler' ) );
+
+		add_action( 'woocommerce_thankyou', array( &$this, 'woo_custom_redirect_after_purchase') , 10 );
+		
 	}
 
 	// Initialise Gateway Settings Form Fields
-	function init_form_fields() {
+	public function init_form_fields() {
 	     $this->form_fields = array(
 	     	'enabled' => array(
 		        'title' => __( 'Enable/Disable', 'woocommerce' ),
@@ -63,72 +69,54 @@ class WC_Babinr_Gateway extends WC_Payment_Gateway {
 	    );
 	}
 
-	function payment_fields()
-      {
-         if ( $this->description ) 
-            echo wpautop(wptexturize($this->description));
-      }
+	public function payment_fields(){
+	    if ( $this->description ) 
+	       echo wpautop(wptexturize($this->description));
+     }
 
-	//Payment checkout page
-	function process_payment( $order_id ) {
-
+	public function process_payment( $order_id ) {
 	    global $woocommerce;
 	    $order = new WC_Order( $order_id );
 
-	    // Mark as on-hold
-	    // $order->update_status('on-hold', __( 'Awaiting bank card payment', 'woocommerce' ));
+	    $order->update_status('on-hold', __( 'Awaiting bank card payment', 'woocommerce' ));
 
-	    // Reduce stock levels
 	    // $order->reduce_order_stock();
 
-	    // Remove cart
-	    // $woocommerce->cart->empty_cart();
+	    $woocommerce->cart->empty_cart();
 
-	    $this->send_request_to_bank( $order );
+  	 	$response_url = $this->send_request_to_bank( $order );
 
-	    // Return thankyou redirect
-	    // return array(
-	    //     'result' => 'success',
-	    //     'redirect' => $this->get_return_url( $order )
-	    // );
+	    return array(
+				'result' 	=> 'success',
+				'redirect'	=> $response_url
+			);
+	    
 	}
 
-	public function webhook() {
+	public function wc_custom_redirect_after_purchase() {
+        var_dump('After Payment has been completed');
+        die();
+	} 		
 
-		var_dump('Here in side the webhook function');
-		$order = wc_get_order( $_GET['id'] );
-		$order->payment_complete();
-		$order->reduce_order_stock();
-	 
-		// update_option('webhook_debug', $_GET);
-	}
-
-	public function response_handler()
-	{
-		var_dump('Here in response_handler function');
-		die();
-	}
-
-	// add_action( "template_redirect", "response_handler" );
-	add_action( 'woocommerce_api_wc_babinr_gateway', array( $this, 'response_handler' ) );
-
-	function send_request_to_bank( $order = null ) {
+	public function send_request_to_bank( $order = null ) {
 		if(!is_null($order)) {
-			// print("<pre>" . print_r($order, true) . "</pre>");
 		    $name = $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
 		    $address = $order->get_shipping_address_1() . ',' . $order->get_shipping_city() . ',' . $order->get_shipping_state() . ',' . $order->get_shipping_postcode() . ',' . $order->get_shipping_country();
-			$ch = null;
+
+			$api_url = null;
     		$token = null;
+
 			if($this->get_option( 'testmode' ) == "no") {
 				$token = $this->get_option( 'live_api_key' );
-   	 			$ch = curl_init('https://nabil.themenepal.info/testPay');
+   	 			$api_url = "https://nabil.themenepal.info/testPay";
 			}else{
 				$token = $this->get_option( 'test_api_key' );
-        		$ch = curl_init('https://sandboxnabil.themenepal.info/testPay');
+        		$api_url = "https://sandboxnabil.themenepal.info/testPay";
 			}
 
 			$params = [
 		        'currency' => $order->get_currency(),
+		        'timeout'     => 45,
 		        'amount' => $order->get_total(),
 		        'name' => $name,
 		        'address' => $address,
@@ -140,15 +128,27 @@ class WC_Babinr_Gateway extends WC_Payment_Gateway {
 		        'canceled' => get_site_url() . '/cancel',
 		        'declined' => get_site_url() . '/decline',
 		        'token' => $token,
+		        'woocommerce' => true,
 		    ];
 
-		    curl_setopt($ch, CURLOPT_POST, 1);
-		    curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-		    if (!$result = curl_exec($ch)) {
-		        trigger_error(curl_error($ch));
-		    }
-		    curl_close($ch);
-		    return $result;
+		    $response=wp_safe_remote_post($api_url,array(
+
+		    	'body'=>$params,
+
+		    ));
+
+		    if ( is_wp_error( $response ) ) {
+			    $error_message = $response->get_error_message();
+			    echo "Something went wrong: $error_message";
+			} else {
+			  
+			   $var=$response['body'];
+
+			 	$var=json_decode($var);
+			   
+			   return $var->url;
+			   exit;
+			}	   
 		}
 	}
 }
