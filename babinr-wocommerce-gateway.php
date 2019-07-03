@@ -10,7 +10,7 @@
 
 /*
  * Plugin Name: Woocommer Payment Gateway By Babin (Ashwin) Rana
- * Plugin URI: https://babinr.com.np
+ * Plugin URI: https://github.com/ashwinrana/nabil-woocommer-payment-gateway
  * Description: Create Own Payment Gateway Plugin.
  * Author: Babin (Ashwin) Rana
  * Author URI: https://babinr.com.np
@@ -37,6 +37,17 @@ function add_wc_babinr_gateway_class( $methods ) {
 	return $methods;
 }
 
+add_action( "template_redirect", "response_handler" );
+add_filter( 'woocommerce_payment_gateways', 'add_wc_babinr_gateway_class' );
+
+add_action( 'plugins_loaded', 'init_babinr_wc_gateway_class' );
+
+// Plugin load and Ask for Payment Class
+function init_babinr_wc_gateway_class() {
+    require_once dirname( __FILE__ ) . '/includes/WC_Babinr_Gateway.php';
+}
+
+//Use to redirect the page after payment process is completed.
 function response_handler(){
 	if(isset($_GET['orderID'])){
 		global $woocommerce, $wp;
@@ -55,9 +66,11 @@ function response_handler(){
 			}
 			if($url == get_site_url() . '/decline'){
 				$order->add_order_note( 'Card has been declined by the bank', false );
+				$order->update_status( 'failed' );
 			}
 			if($url == get_site_url() . '/cancel'){
-				$order->add_order_note( 'Transaction has been canceled', false );
+				$order->add_order_note( 'Transaction has been canceled by the user', false );
+				$order->update_status( 'cancelled' );
 			}
 		}else{
 			status_header( 404 );
@@ -66,13 +79,4 @@ function response_handler(){
 	        exit();
 		}
 	}
-}
-add_action( "template_redirect", "response_handler" );
-add_filter( 'woocommerce_payment_gateways', 'add_wc_babinr_gateway_class' );
-
-add_action( 'plugins_loaded', 'init_babinr_wc_gateway_class' );
-
-// Plugin load and Ask for Payment Class
-function init_babinr_wc_gateway_class() {
-    require_once dirname( __FILE__ ) . '/includes/WC_Babinr_Gateway.php';
 }
