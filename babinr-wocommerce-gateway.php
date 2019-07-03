@@ -10,7 +10,7 @@
 
 /*
  * Plugin Name: Woocommer Payment Gateway By Babin (Ashwin) Rana
- * Plugin URI: https://github.com/ashwinrana/nabil-woocommer-payment-gateway
+ * Plugin URI: https://github.com/ashwinrana/nabil-woocommerce-payment-gateway
  * Description: Create Own Payment Gateway Plugin.
  * Author: Babin (Ashwin) Rana
  * Author URI: https://babinr.com.np
