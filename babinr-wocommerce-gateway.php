@@ -5,16 +5,16 @@
  * @category  Admin
  * @copyright Copyright (c) 2015-2016, Babinr and WooCommerce
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
- * @version 0.0.1
+ * @version 0.0.4
  */
 
 /*
  * Plugin Name: Woocommer Payment Gateway By Babin (Ashwin) Rana
- * Plugin URI: https://babinr.com.np
+ * Plugin URI: https://github.com/ashwinrana/nabil-woocommerce-payment-gateway
  * Description: Create Own Payment Gateway Plugin.
  * Author: Babin (Ashwin) Rana
  * Author URI: https://babinr.com.np
- * Version: 0.0.2
+ * Version: 0.0.3
  * 
  * Copyright: © 2009-2015 WooCommerce.
  * License: GNU General Public License v3.0
@@ -38,40 +38,6 @@ function add_wc_babinr_gateway_class( $methods ) {
 }
 
 add_action( "template_redirect", "response_handler" );
-
-function response_handler(){
-	global $woocommerce, $wp;
-	$url = home_url($wp->request);
-	if($url == get_site_url() . '/accept'){
-		$order = wc_get_order( $_GET['orderID'] );
-		$order->payment_complete();
-		$order->reduce_order_stock();
-		// update_option('webhook_debug', $_GET);
-		wp_safe_redirect( $this->get_return_url( $order ) );
-		exit;
-
-	}
-	if($url == get_site_url() . '/decline'){
-		// wp_safe_redirect( $url );
-		// exit;
-	}
-	if($url == get_site_url() . '/cancel'){
-		// wp_safe_redirect( $url );
-		// exit;
-	}
-	
-	// if(isset($_GET['orderID'])){
-	// 	$order = wc_get_order( $_GET['orderID'] );
-	// 	print_r($order . '<pre>');
-	// 	die();
-	// $order->payment_complete();
-	// $order->reduce_order_stock();
- 
-	// update_option('webhook_debug', $_GET);
-	// wp_safe_redirect( $this->get_return_url( $order ) );
-	// exit;
-	// }
-}
 add_filter( 'woocommerce_payment_gateways', 'add_wc_babinr_gateway_class' );
 
 add_action( 'plugins_loaded', 'init_babinr_wc_gateway_class' );
@@ -79,4 +45,55 @@ add_action( 'plugins_loaded', 'init_babinr_wc_gateway_class' );
 // Plugin load and Ask for Payment Class
 function init_babinr_wc_gateway_class() {
     require_once dirname( __FILE__ ) . '/includes/WC_Babinr_Gateway.php';
+}
+
+// Use to redirect the page after payment process is completed.
+function response_handler(){
+	if(isset($_GET['orderID'])){
+		global $woocommerce, $wp;
+		$url = home_url($wp->request);
+		$order = wc_get_order( $_GET['orderID'] );
+		if($order != null){
+			$quantity = $order->get_item_count();
+			if($url == get_site_url() . '/accept'){
+				$order->payment_complete();
+				$order->reduce_order_stock();
+				$woocommerce->cart->empty_cart();
+				$order->add_order_note( 'Hey, your order is paid! Thank you!', true );
+				$url = $order->get_checkout_order_received_url();
+				wp_safe_redirect( $url );
+				exit();
+			}
+			if($url == get_site_url() . '/decline'){
+				$order->add_order_note( 'Card has been declined by the bank', false );
+				$order->update_status( 'failed' );
+				add_filter( 'template_include', 'redirect_to_plugin_page');
+			}
+			if($url == get_site_url() . '/cancel'){
+				$order->add_order_note( 'Transaction has been canceled by the user', false );
+				$order->update_status( 'cancelled' );
+				add_filter( 'template_include', 'redirect_to_plugin_page', 99);
+			}
+		}else{
+			status_header( 404 );
+	        nocache_headers();
+	        include( get_query_template( '404' ) );
+	        exit();
+		}
+	}
+}
+
+// Show the custom templete
+function redirect_to_plugin_page( $template ) {
+	global $wp;
+	$url = home_url($wp->request);
+	if($url == get_site_url() . '/decline'){
+		$new_template =  plugin_dir_path( __FILE__ ) . 'templates/declined.php';
+        return $new_template;
+	}
+	if($url == get_site_url() . '/cancel'){
+		$new_template =  plugin_dir_path( __FILE__ ) . 'templates/canceled.php';
+        return $new_template;
+	}
+	return;
 }
