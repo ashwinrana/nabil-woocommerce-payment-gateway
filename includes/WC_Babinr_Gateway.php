@@ -1,7 +1,7 @@
 <?php
 /**
  * @package Babinr_Wocommerce_Gateway
- * @version 0.0.1
+ * @version 0.0.3
  */
 
 class WC_Babinr_Gateway extends WC_Payment_Gateway 
@@ -17,12 +17,7 @@ class WC_Babinr_Gateway extends WC_Payment_Gateway
 		$this->init_form_fields();
 		$this->init_settings();
 		$this->title = $this->get_option( 'title' );
-
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
-		// add_action( 'woocommerce_api_wc_babinr_gateway', array( $this, 'response_handler' ) );
-
-		add_action( 'woocommerce_thankyou', array( &$this, 'woo_custom_redirect_after_purchase') , 10 );
-		
 	}
 
 	// Initialise Gateway Settings Form Fields
@@ -80,10 +75,6 @@ class WC_Babinr_Gateway extends WC_Payment_Gateway
 
 	    $order->update_status('on-hold', __( 'Awaiting bank card payment', 'woocommerce' ));
 
-	    // $order->reduce_order_stock();
-
-	    $woocommerce->cart->empty_cart();
-
   	 	$response_url = $this->send_request_to_bank( $order );
 
 	    return array(
@@ -91,12 +82,7 @@ class WC_Babinr_Gateway extends WC_Payment_Gateway
 				'redirect'	=> $response_url
 			);
 	    
-	}
-
-	public function wc_custom_redirect_after_purchase() {
-        var_dump('After Payment has been completed');
-        die();
-	} 		
+	}	
 
 	public function send_request_to_bank( $order = null ) {
 		if(!is_null($order)) {
@@ -116,7 +102,7 @@ class WC_Babinr_Gateway extends WC_Payment_Gateway
 
 			$params = [
 		        'currency' => $order->get_currency(),
-		        'timeout'     => 45,
+		        'timeout'     => 60,
 		        'amount' => $order->get_total(),
 		        'name' => $name,
 		        'address' => $address,
