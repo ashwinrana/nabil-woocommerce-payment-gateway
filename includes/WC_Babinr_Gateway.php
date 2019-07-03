@@ -1,7 +1,7 @@
 <?php
 /**
  * @package Babinr_Wocommerce_Gateway
- * @version 0.0.3
+ * @version 0.0.4
  */
 
 class WC_Babinr_Gateway extends WC_Payment_Gateway 

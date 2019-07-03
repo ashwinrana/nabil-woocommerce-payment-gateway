@@ -5,7 +5,7 @@
  * @category  Admin
  * @copyright Copyright (c) 2015-2016, Babinr and WooCommerce
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
- * @version 0.0.3
+ * @version 0.0.4
  */
 
 /*
@@ -47,7 +47,7 @@ function init_babinr_wc_gateway_class() {
     require_once dirname( __FILE__ ) . '/includes/WC_Babinr_Gateway.php';
 }
 
-//Use to redirect the page after payment process is completed.
+// Use to redirect the page after payment process is completed.
 function response_handler(){
 	if(isset($_GET['orderID'])){
 		global $woocommerce, $wp;
@@ -83,6 +83,7 @@ function response_handler(){
 	}
 }
 
+// Show the custom templete
 function redirect_to_plugin_page( $template ) {
 	global $wp;
 	$url = home_url($wp->request);
