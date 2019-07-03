@@ -73,7 +73,7 @@ class WC_Babinr_Gateway extends WC_Payment_Gateway
 	    global $woocommerce;
 	    $order = new WC_Order( $order_id );
 
-	    $order->update_status('on-hold', __( 'Awaiting bank card payment', 'woocommerce' ));
+	    $order->update_status('pending-payment', __( 'Awaiting Card payment', 'woocommerce' ));
 
   	 	$response_url = $this->send_request_to_bank( $order );
 

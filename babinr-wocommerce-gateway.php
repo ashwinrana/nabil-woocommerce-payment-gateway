@@ -67,10 +67,12 @@ function response_handler(){
 			if($url == get_site_url() . '/decline'){
 				$order->add_order_note( 'Card has been declined by the bank', false );
 				$order->update_status( 'failed' );
+				add_filter( 'template_include', 'redirect_to_plugin_page');
 			}
 			if($url == get_site_url() . '/cancel'){
 				$order->add_order_note( 'Transaction has been canceled by the user', false );
 				$order->update_status( 'cancelled' );
+				add_filter( 'template_include', 'redirect_to_plugin_page', 99);
 			}
 		}else{
 			status_header( 404 );
@@ -79,4 +81,18 @@ function response_handler(){
 	        exit();
 		}
 	}
+}
+
+function redirect_to_plugin_page( $template ) {
+	global $wp;
+	$url = home_url($wp->request);
+	if($url == get_site_url() . '/decline'){
+		$new_template =  plugin_dir_path( __FILE__ ) . 'templates/declined.php';
+        return $new_template;
+	}
+	if($url == get_site_url() . '/cancel'){
+		$new_template =  plugin_dir_path( __FILE__ ) . 'templates/canceled.php';
+        return $new_template;
+	}
+	return;
 }
