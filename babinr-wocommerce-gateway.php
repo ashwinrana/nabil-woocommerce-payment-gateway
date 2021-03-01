@@ -5,16 +5,16 @@
  * @category  Admin
  * @copyright Copyright (c) 2015-2016, Babinr and WooCommerce
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
- * @version 0.0.4
+ * @version 1.0.0 
  */
 
 /*
  * Plugin Name: Woocommer Payment Gateway By Babin (Ashwin) Rana
  * Plugin URI: https://github.com/ashwinrana/nabil-woocommerce-payment-gateway
- * Description: Create Own Payment Gateway Plugin.
+ * Description: Your Own Woocommerce Payment Gateway Plugin for Nabil Bank.
  * Author: Babin (Ashwin) Rana
  * Author URI: https://babinr.com.np
- * Version: 0.0.3
+ * Version: 1.0.0
  * 
  * Copyright: © 2009-2015 WooCommerce.
  * License: GNU General Public License v3.0
