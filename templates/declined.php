@@ -139,8 +139,8 @@
 		<div class="msg">
 			<p class="response">Declined !</p>
 			<p class="desc">Sorry the payment was declined. Please try again later.</p>
-			<?php if(isset($_GET['orderID'])) :?>
-				<p class="desc">You Order Id is: <?php echo $_GET['orderID']; ?></p>
+			<?php if(isset($_GET['request_id'])) :?>
+				<p class="desc">You Order Id is: <?php echo $_GET['request_id']; ?></p>
 				<p class="desc">Please save this number so that we can verify it later.</p>
 			<?php endif; ?>
 		</div>

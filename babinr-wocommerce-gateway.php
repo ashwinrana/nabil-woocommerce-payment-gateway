@@ -5,7 +5,7 @@
  * @category  Admin
  * @copyright Copyright (c) 2015-2016, Babinr and WooCommerce
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
- * @version 1.0.0 
+ * @version 1.0.1 
  */
 
 /*
@@ -14,7 +14,7 @@
  * Description: Your Own Woocommerce Payment Gateway Plugin for Nabil Bank.
  * Author: Babin (Ashwin) Rana
  * Author URI: https://babinr.com.np
- * Version: 1.0.0
+ * Version: 1.0.1
  * 
  * Copyright: © 2009-2015 WooCommerce.
  * License: GNU General Public License v3.0
@@ -49,10 +49,10 @@ function init_babinr_wc_gateway_class() {
 
 // Use to redirect the page after payment process is completed.
 function response_handler(){
-	if(isset($_GET['orderID'])){
+	if(isset($_GET['request_id'])){
 		global $woocommerce, $wp;
 		$url = home_url($wp->request);
-		$order = wc_get_order( $_GET['orderID'] );
+		$order = wc_get_order( $_GET['request_id'] );
 		if($order != null){
 			$quantity = $order->get_item_count();
 			if($url == get_site_url() . '/accept'){

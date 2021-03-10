@@ -140,8 +140,8 @@
 		<div class="msg">
 			<p class="response">Canceled !</p>
 			<p class="desc">We are so sorry to see that you have canceled the payment. Please do let us know if we could help you change your decision.</p>
-			<?php if(isset($_GET['orderID'])) :?>
-				<p class="desc">You Order Id is: <?php echo $_GET['orderID']; ?></p>
+			<?php if(isset($_GET['request_id'])) :?>
+				<p class="desc">You Order Id is: <?php echo $_GET['request_id']; ?></p>
 				<p class="desc">Please save this number so that we can verify it later.</p>
 			<?php endif; ?>
 		</div>
