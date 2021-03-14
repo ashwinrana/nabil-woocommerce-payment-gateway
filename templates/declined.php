@@ -137,11 +137,14 @@
 			</svg>
 		</div>
 		<div class="msg">
-			<p class="response">Declined !</p>
-			<p class="desc">Sorry the payment was declined. Please try again later.</p>
+			<p class="response">Transaction Failed !</p>
+			<p class="desc">Sorry! We could not process your transaction. Below are possible reasons of failure</p>
 			<?php if(isset($_GET['request_id'])) :?>
 				<p class="desc">You Order Id is: <?php echo $_GET['request_id']; ?></p>
-				<p class="desc">Please save this number so that we can verify it later.</p>
+				<p class="desc">You might have entered wrong card number, expiry date or CVV code.</p>
+				<p class="desc">You might have entered wrong OTP / Verification code.</p>
+				<p class="desc">Your card issuing bank declined the card processing. Please ask your bank to enable “Online Transaction” in your card.</p>
+				<p class="desc">If you think everything is fine then please try again.</p>
 			<?php endif; ?>
 		</div>
 		<div class="btn-sec">

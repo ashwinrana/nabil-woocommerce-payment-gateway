@@ -1,7 +1,7 @@
 <?php
 /**
  * @package Babinr_Wocommerce_Gateway
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 class WC_Babinr_Gateway extends WC_Payment_Gateway 
@@ -9,7 +9,7 @@ class WC_Babinr_Gateway extends WC_Payment_Gateway
 
 	public function __construct() {
 		$this->id 					= "babinr_gateway";
-		$this->icon 				= apply_filters('woocommerce_offline_icon', '');
+		$this->icon 				= apply_filters('woocommerce_offline_icon', plugin_dir_url( __DIR__ ) . 'assets/images/payment-gateway.jpeg');
 		$this->has_fields 			= false;
 		$this->method_title 		= "Babinr Payment Gateway";
 		$this->method_description 	= "Your Own Woocommerce Payment Gateway Plugin for Nabil Bank";
